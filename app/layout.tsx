@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito, Public_Sans } from "next/font/google";
+import { Nunito, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -8,7 +8,7 @@ const nunito = Nunito({
   variable: "--font-heading",
 });
 
-const publicSans = Public_Sans({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-body",
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${nunito.variable} ${publicSans.variable}`}>
+    <html lang="en" className={`${nunito.variable} ${plusJakarta.variable}`}>
       <body>{children}</body>
     </html>
   );

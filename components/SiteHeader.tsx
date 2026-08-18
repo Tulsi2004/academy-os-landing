@@ -8,6 +8,8 @@ const NAV_LINKS = [
   { href: "#modules", label: "Features" },
   { href: "#how-it-works", label: "How it works" },
   { href: "#for-you", label: "Who it's for" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "#faq", label: "FAQ" },
 ];
 
 export function SiteHeader() {

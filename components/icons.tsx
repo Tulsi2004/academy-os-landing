@@ -144,3 +144,88 @@ export function DocumentsIcon(props: SVGProps<SVGSVGElement>) {
     </Icon>
   );
 }
+
+export function ClockIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path className="clock-hand-hour" d="M12 12 12 8" />
+      <path className="clock-hand-minute" d="M12 12 15.2 13.6" />
+    </Icon>
+  );
+}
+
+export function BellIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M5.5 16V11a6.5 6.5 0 0 1 13 0v5l1.6 2.5H3.9L5.5 16Z" />
+      <path d="M9.75 20a2.25 2.25 0 0 0 4.5 0" />
+    </Icon>
+  );
+}
+
+export function TeamIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <circle cx="8.5" cy="8" r="3.25" />
+      <circle cx="16" cy="9.5" r="2.5" />
+      <path d="M2.5 20c0-3.6 2.7-6.5 6-6.5s6 2.9 6 6.5" />
+      <path d="M14.5 14.2c2.6.4 4.5 2.7 4.5 5.8" />
+    </Icon>
+  );
+}
+
+export function ShieldIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M12 3.5 19 6v6c0 4.5-3 7.5-7 8.5-4-1-7-4-7-8.5V6l7-2.5Z" />
+      <path d="m9 12 2 2 4-4.5" />
+    </Icon>
+  );
+}
+
+export function CheckIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="m4 12.5 5 5 11-11" />
+    </Icon>
+  );
+}
+
+export function ChevronIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="m6 9 6 6 6-6" />
+    </Icon>
+  );
+}
+
+export function LinkedInGlyph(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="4" />
+      <path d="M7.5 10.5v6M7.5 7.75v.01" />
+      <path d="M11.5 16.5v-3.75a2.25 2.25 0 0 1 4.5 0V16.5" />
+      <path d="M11.5 16.5v-6" />
+    </Icon>
+  );
+}
+
+export function InstagramGlyph(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="3.75" />
+      <path d="M16.7 7.3v.01" />
+    </Icon>
+  );
+}
+
+export function WhatsAppGlyph(props: SVGProps<SVGSVGElement>) {
+  return (
+    <Icon {...props}>
+      <path d="M4 20l1.2-3.9A7.75 7.75 0 1 1 8.6 19L4 20Z" />
+      <path d="M8.7 9.3c.15-.5.5-.5.85-.5.3 0 .45.1.55.35.15.35.5 1.2.55 1.3.05.1.08.25 0 .4-.1.2-.15.3-.3.45-.15.15-.3.35-.15.6.35.65.85 1.2 1.45 1.6.6.4.85.35 1.05.15.2-.2.35-.4.5-.55.15-.15.3-.15.5-.05.2.1 1.25.6 1.45.7.2.1.35.15.4.25.05.1.05.55-.15 1.05-.2.5-1.15.95-1.6.98-.4.03-.75.15-2.55-.6-1.8-.75-2.9-2.55-3-2.7-.1-.15-.75-1-.75-1.9 0-.9.45-1.35.6-1.55Z" />
+    </Icon>
+  );
+}
