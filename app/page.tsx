@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { BrandMark } from "@/components/BrandMark";
 import { RevealGroup } from "@/components/RevealGroup";
-import { APP_URL } from "@/lib/config";
+import { APP_URL, LINKEDIN_URL, WHATSAPP_URL } from "@/lib/config";
 import {
   EnquiriesIcon,
   StudentsIcon,
@@ -22,7 +22,6 @@ import {
   CheckIcon,
   ChevronIcon,
   LinkedInGlyph,
-  InstagramGlyph,
   WhatsAppGlyph,
 } from "@/components/icons";
 
@@ -123,9 +122,8 @@ const FOOTER_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { label: "LinkedIn", href: "https://linkedin.com", Icon: LinkedInGlyph },
-  { label: "Instagram", href: "https://instagram.com", Icon: InstagramGlyph },
-  { label: "WhatsApp", href: "https://wa.me", Icon: WhatsAppGlyph },
+  { label: "LinkedIn", href: LINKEDIN_URL, Icon: LinkedInGlyph },
+  { label: "WhatsApp", href: WHATSAPP_URL, Icon: WhatsAppGlyph },
 ];
 
 export default function Home() {
@@ -576,7 +574,10 @@ export default function Home() {
           <div className="footer-top">
             <a href="#top" className="brand">
               <BrandMark />
-              Academy OS
+              <span className="brand-text">
+                <span className="brand-parent">TULSI</span>
+                <span className="brand-product">Academy OS</span>
+              </span>
             </a>
             <nav className="footer-nav" aria-label="Footer">
               {FOOTER_LINKS.map((link) => (

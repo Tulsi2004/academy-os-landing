@@ -20,7 +20,10 @@ export function SiteHeader() {
       <div className="container header-inner">
         <a href="#top" className="brand">
           <BrandMark />
-          Academy OS
+          <span className="brand-text">
+            <span className="brand-parent">TULSI</span>
+            <span className="brand-product">Academy OS</span>
+          </span>
         </a>
 
         <nav className="site-nav" aria-label="Primary">

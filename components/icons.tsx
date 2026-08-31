@@ -211,16 +211,6 @@ export function LinkedInGlyph(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function InstagramGlyph(props: SVGProps<SVGSVGElement>) {
-  return (
-    <Icon {...props}>
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="3.75" />
-      <path d="M16.7 7.3v.01" />
-    </Icon>
-  );
-}
-
 export function WhatsAppGlyph(props: SVGProps<SVGSVGElement>) {
   return (
     <Icon {...props}>
