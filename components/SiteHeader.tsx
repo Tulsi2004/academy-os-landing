@@ -2,28 +2,28 @@
 
 import { useState } from "react";
 import { BrandMark } from "./BrandMark";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { APP_URL } from "@/lib/config";
-
-const NAV_LINKS = [
-  { href: "#modules", label: "Features" },
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#for-you", label: "Who it's for" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#faq", label: "FAQ" },
-];
+import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { t } = useLanguage();
+
+  const NAV_LINKS = [
+    { href: "#modules", label: t.nav.features },
+    { href: "#how-it-works", label: t.nav.howItWorks },
+    { href: "#for-you", label: t.nav.whoItsFor },
+    { href: "#pricing", label: t.nav.pricing },
+    { href: "#faq", label: t.nav.faq },
+  ];
 
   return (
     <header className="site-header">
       <div className="container header-inner">
         <a href="#top" className="brand">
           <BrandMark />
-          <span className="brand-text">
-            <span className="brand-parent">TULSI</span>
-            <span className="brand-product">Academy OS</span>
-          </span>
+          Academy OS
         </a>
 
         <nav className="site-nav" aria-label="Primary">
@@ -35,8 +35,9 @@ export function SiteHeader() {
         </nav>
 
         <div className="header-cta">
+          <LanguageSwitcher />
           <a className="btn btn-primary" href={APP_URL}>
-            Start now
+            {t.nav.startNow}
           </a>
         </div>
 
@@ -59,8 +60,11 @@ export function SiteHeader() {
           </a>
         ))}
         <a className="btn btn-primary" href={APP_URL} onClick={() => setOpen(false)}>
-          Start now
+          {t.nav.startNow}
         </a>
+        <div className="mobile-lang">
+          <LanguageSwitcher />
+        </div>
       </div>
     </header>
   );
