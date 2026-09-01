@@ -494,7 +494,10 @@ export default function Home() {
           <div className="footer-top">
             <a href="#top" className="brand">
               <BrandMark />
-              Academy OS
+              <span className="brand-text">
+                <span className="brand-parent">TULSI</span>
+                <span className="brand-product">Academy OS</span>
+              </span>
             </a>
             <nav className="footer-nav" aria-label="Footer">
               {FOOTER_LINKS.map((link) => (
