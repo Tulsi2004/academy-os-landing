@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito, Plus_Jakarta_Sans } from "next/font/google";
+import { Fraunces, Nunito, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import "./globals.css";
@@ -10,6 +10,13 @@ const nunito = Nunito({
   subsets: ["latin"],
   weight: ["600", "700", "800", "900"],
   variable: "--font-heading",
+});
+
+// The TULSI wordmark is Fraunces everywhere (matches tulsi-landing-pg).
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-brand-family",
 });
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -58,7 +65,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${nunito.variable} ${plusJakarta.variable}`}>
+    <html lang="en" className={`${nunito.variable} ${plusJakarta.variable} ${fraunces.variable}`}>
       <body>
         <script
           type="application/ld+json"

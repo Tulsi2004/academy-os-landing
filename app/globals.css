@@ -22,6 +22,8 @@
 
   --font-heading: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Shared TULSI wordmark face — same Fraunces used on tulsi-landing-pg. */
+  --font-brand: var(--font-brand-family), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
 }
 
 * {
@@ -562,8 +564,9 @@ a {
 }
 
 .brand-parent {
+  font-family: var(--font-brand), serif;
   font-size: 0.625rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #2c3a75;
