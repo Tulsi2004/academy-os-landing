@@ -1,0 +1,262 @@
+// Analytics + leads schema for the TULSI landing sites.
+//
+// Both landing sites (academy-os-landing, tulsi-landing) share ONE database.
+// Every row carries a `site` discriminator ("academy" | "tulsi") so each admin
+// panel reads only its own traffic. See lib/site.ts for the per-repo constant.
+//
+// MIGRATION OWNERSHIP: academy-os-landing owns prisma/migrations. tulsi-landing
+// keeps an identical copy of this schema but only runs `prisma generate`.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Visitor {
+  id             String   @id @default(cuid())
+  site           String
+  fingerprint    String
+  firstSeenAt    DateTime @default(now())
+  lastSeenAt     DateTime @updatedAt
+  isReturning    Boolean  @default(false)
+  country        String?
+  region         String?
+  city           String?
+  timezone       String?
+  language       String?
+  browser        String?
+  browserVersion String?
+  os             String?
+  deviceType     String?
+  screenWidth    Int?
+  screenHeight   Int?
+
+  sessions Session[]
+  leads    Lead[]
+
+  @@unique([site, fingerprint])
+  @@index([site, firstSeenAt])
+}
+
+model Session {
+  id             String    @id @default(cuid())
+  site           String
+  clientId       String    @unique
+  visitorId      String
+  visitor        Visitor   @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  startedAt      DateTime  @default(now())
+  endedAt        DateTime?
+  totalDuration  Int?
+  isBounce       Boolean   @default(true)
+  pagesViewed    Int       @default(0)
+  entryPath      String?
+  exitPath       String?
+  referrer       String?
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  utmContent     String?
+  utmTerm        String?
+  gclid          String?
+  fbclid         String?
+  msclkid        String?
+  ipAddress      String?
+  viewportWidth  Int?
+  viewportHeight Int?
+
+  pageViews     PageView[]
+  events        Event[]
+  scrollEvents  ScrollEvent[]
+  ctaEvents     CtaEvent[]
+  formEvents    FormEvent[]
+  perfMetrics   PerformanceMetric[]
+  errors        ErrorEvent[]
+  leads         Lead[]
+  mouseEvents   MouseEvent[]
+  heatmapEvents HeatmapEvent[]
+  replays       SessionReplay[]
+
+  @@index([visitorId])
+  @@index([site, startedAt])
+  @@index([site, utmSource, utmMedium, utmCampaign])
+}
+
+model PageView {
+  id         String    @id @default(cuid())
+  site       String
+  sessionId  String
+  session    Session   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  path       String
+  title      String?
+  enteredAt  DateTime  @default(now())
+  exitedAt   DateTime?
+  timeOnPage Int?
+
+  @@index([sessionId])
+  @@index([site, path])
+  @@index([site, enteredAt])
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  site      String
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  name      String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([site, name])
+}
+
+model ScrollEvent {
+  id          String   @id @default(cuid())
+  site        String
+  sessionId   String
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  path        String
+  depth       Int
+  timeToReach Int?
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([site, path, depth])
+  @@index([site, createdAt])
+}
+
+model CtaEvent {
+  id              String   @id @default(cuid())
+  site            String
+  sessionId       String
+  session         Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  ctaId           String
+  action          String // viewed | hovered | clicked
+  timeBeforeClick Int?
+  createdAt       DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([site, ctaId, action])
+  @@index([site, createdAt])
+}
+
+model FormEvent {
+  id           String   @id @default(cuid())
+  site         String
+  sessionId    String
+  session      Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  formId       String
+  action       String // viewed | started | field_focus | field_complete | validation_error | abandoned | submitted
+  fieldName    String?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([site, formId, action])
+  @@index([site, createdAt])
+}
+
+model PerformanceMetric {
+  id        String   @id @default(cuid())
+  site      String
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  path      String
+  metric    String // LCP | INP | CLS | FCP | TTFB
+  value     Float
+  rating    String // good | needs-improvement | poor
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([site, path, metric])
+  @@index([site, createdAt])
+}
+
+model ErrorEvent {
+  id        String   @id @default(cuid())
+  site      String
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  type      String // js | unhandled_rejection | image_load
+  message   String
+  stack     String?
+  path      String?
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([site, type, createdAt])
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  site      String
+  visitorId String?
+  visitor   Visitor? @relation(fields: [visitorId], references: [id], onDelete: SetNull)
+  sessionId String?
+  session   Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  formId    String?
+  name      String?
+  phone     String?
+  email     String?
+  company   String? // academy / organisation name
+  interest  String? // which product or plan they asked about
+  message   String?
+  source    String?
+  status    String   @default("new") // new | contacted | qualified | won | lost (app-enforced, not a DB enum)
+  createdAt DateTime @default(now())
+
+  @@index([site, createdAt])
+  @@index([site, status])
+}
+
+model MouseEvent {
+  id             String   @id @default(cuid())
+  site           String
+  sessionId      String
+  session        Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  path           String
+  type           String // rage_click | dead_click | double_click
+  x              Int
+  y              Int
+  targetSelector String?
+  hoverDuration  Int?
+  createdAt      DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([site, path, type])
+  @@index([site, createdAt])
+}
+
+model HeatmapEvent {
+  id            String   @id @default(cuid())
+  site          String
+  sessionId     String
+  session       Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  path          String
+  type          String // click | hover
+  xPct          Float
+  yPct          Float
+  viewportWidth Int?
+  createdAt     DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([site, path, type])
+}
+
+model SessionReplay {
+  id         String   @id @default(cuid())
+  site       String
+  sessionId  String
+  session    Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  seq        Int
+  data       Bytes // gzip-compressed JSON array of rrweb events
+  eventCount Int
+  createdAt  DateTime @default(now())
+
+  @@unique([sessionId, seq])
+  @@index([sessionId, seq])
+}

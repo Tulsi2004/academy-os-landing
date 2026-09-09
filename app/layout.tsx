@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Nunito, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
+import { Tracker } from "@/components/Tracker";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://academy-os-landing.vercel.app";
@@ -72,6 +73,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}
         />
         <LanguageProvider>{children}</LanguageProvider>
+        <Tracker />
         <Analytics />
       </body>
     </html>
