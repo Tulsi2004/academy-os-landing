@@ -257,6 +257,17 @@ export function trackEvent(name: string, metadata?: Json): void {
   bump();
 }
 
+/**
+ * The visitor/session block /api/leads expects, so a lead submitted from the
+ * page is attributed to the same visitor the beacon is already tracking.
+ * Null when the beacon never started (admin page, ad blocker, JS error) — the
+ * lead still saves, just unattributed.
+ */
+export function getTrackingIdentity(): { visitor: Json; session: Json } | null {
+  if (!state) return null;
+  return { visitor: state.visitor, session: state.session };
+}
+
 /** Record a form-funnel step (viewed/started/field_focus/.../submitted). */
 export function trackFormEvent(
   formId: string,

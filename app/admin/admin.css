@@ -718,3 +718,93 @@
     font-size: 1.45rem;
   }
 }
+
+/* --- Skeletons ------------------------------------------------------------ */
+
+/*
+ * Placeholder shimmer. The highlight is mixed from the panel's own tokens, so
+ * each site's skeletons pick up that site's palette without a second theme.
+ */
+.adm-skel {
+  display: block;
+  background-color: color-mix(in srgb, var(--adm-line) 62%, var(--adm-panel));
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--adm-panel) 76%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: admShimmer 1.5s ease-in-out infinite;
+  flex: none;
+}
+
+@keyframes admShimmer {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+/* A still placeholder still communicates "loading" — the motion is decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .adm-skel {
+    animation: none;
+    background-image: none;
+  }
+}
+
+.adm-skel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.adm-skel-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  width: 100%;
+}
+
+.adm-skel-funnel-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Announced to screen readers, invisible to everyone else. */
+.adm-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Load more ------------------------------------------------------------ */
+
+.adm-loadmore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 0 4px;
+}
+
+.adm-loadmore-count {
+  color: var(--adm-muted);
+  font-size: 0.8125rem;
+}
+
+.adm-loadmore-error {
+  color: var(--adm-bad);
+  font-size: 0.8125rem;
+}

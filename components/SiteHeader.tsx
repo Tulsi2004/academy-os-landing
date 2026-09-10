@@ -1,27 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { BrandMark } from "./BrandMark";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { APP_URL } from "@/lib/config";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { useSectionHref } from "@/lib/useSectionHref";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
+  const section = useSectionHref();
 
   const NAV_LINKS = [
-    { href: "#modules", label: t.nav.features },
-    { href: "#how-it-works", label: t.nav.howItWorks },
-    { href: "#for-you", label: t.nav.whoItsFor },
-    { href: "#pricing", label: t.nav.pricing },
-    { href: "#faq", label: t.nav.faq },
+    { href: section("modules"), label: t.nav.features },
+    { href: section("how-it-works"), label: t.nav.howItWorks },
+    { href: section("for-you"), label: t.nav.whoItsFor },
+    { href: section("pricing"), label: t.nav.pricing },
+    { href: section("faq"), label: t.nav.faq },
   ];
 
   return (
     <header className="site-header">
       <div className="container header-inner">
-        <a href="#top" className="brand">
+        <a href={section("top")} className="brand">
           <BrandMark />
           <span className="brand-text">
             <span className="brand-parent">TULSI</span>
@@ -35,6 +38,7 @@ export function SiteHeader() {
               {link.label}
             </a>
           ))}
+          <Link href="/blog">{t.nav.blog}</Link>
         </nav>
 
         <div className="header-cta">
@@ -62,6 +66,9 @@ export function SiteHeader() {
             {link.label}
           </a>
         ))}
+        <Link href="/blog" onClick={() => setOpen(false)}>
+          {t.nav.blog}
+        </Link>
         <a className="btn btn-primary" href={APP_URL} onClick={() => setOpen(false)}>
           {t.nav.startNow}
         </a>

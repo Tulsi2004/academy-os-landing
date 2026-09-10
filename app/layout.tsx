@@ -49,6 +49,21 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Publisher node for the whole site.
+ *
+ * Blog articles reference it as `publisher: { "@id": ... }`, so it has to be
+ * defined once, site-wide, with a matching @id.
+ */
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `${siteUrl}/#organization`,
+  name: "TULSI",
+  url: siteUrl,
+  description: "Workflow-first software for industries that run on paper, spreadsheets and WhatsApp.",
+};
+
 const softwareApplicationSchema = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -57,7 +72,7 @@ const softwareApplicationSchema = {
   operatingSystem: "Web",
   url: siteUrl,
   description: "Academy management software for dance, music, art and coaching academies.",
-  publisher: { "@type": "Organization", name: "TULSI" },
+  publisher: { "@id": `${siteUrl}/#organization` },
 };
 
 export default function RootLayout({
@@ -68,6 +83,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${nunito.variable} ${plusJakarta.variable} ${fraunces.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}

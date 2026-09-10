@@ -149,13 +149,47 @@ export async function getTrafficSources(days = 30): Promise<TrafficSource[]> {
   return rows.map((r) => ({ ...r, sessions: Number(r.sessions), leads: Number(r.leads) }));
 }
 
+// --- Paging ------------------------------------------------------------------
+
+/*
+ * Cursor paging for the list pages.
+ *
+ * Keyset rather than offset: `skip`/`take` re-scans the table for every page and
+ * drifts when a new row lands mid-browse, whereas an id cursor is stable and
+ * stays fast at any depth. Each list orders by [timestamp desc, id desc] so the
+ * id can break ties, and `cursorArgs` over-fetches by one row — that spare row
+ * is how we know whether a next page exists without a second COUNT query.
+ */
+
+export const LEADS_PAGE_SIZE = 50;
+export const SESSIONS_PAGE_SIZE = 50;
+export const ERRORS_PAGE_SIZE = 50;
+
+export type Page<T> = { items: T[]; nextCursor: string | null };
+
+function cursorArgs(cursor: string | undefined, take: number) {
+  return {
+    take: take + 1,
+    ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+  };
+}
+
+function toPage<T extends { id: string }>(rows: T[], take: number): Page<T> {
+  const items = rows.slice(0, take);
+  return {
+    items,
+    nextCursor: rows.length > take ? (items[items.length - 1]?.id ?? null) : null,
+  };
+}
+
 // --- Leads -------------------------------------------------------------------
 
-export async function getLeads(status?: LeadStatus) {
+export async function getLeads(status?: LeadStatus, cursor?: string, take = LEADS_PAGE_SIZE) {
   return prisma.lead.findMany({
     where: { site: SITE, ...(status ? { status } : {}) },
-    orderBy: { createdAt: "desc" },
-    take: 500,
+    // `id` breaks ties so the cursor is stable when two leads share a timestamp.
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    ...cursorArgs(cursor, take),
     include: {
       session: {
         select: { utmSource: true, utmMedium: true, utmCampaign: true, referrer: true, id: true },
@@ -166,6 +200,15 @@ export async function getLeads(status?: LeadStatus) {
 }
 
 export type LeadRow = Awaited<ReturnType<typeof getLeads>>[number];
+
+/** One page of leads, plus the cursor that fetches the next. */
+export async function getLeadsPage(
+  status?: LeadStatus,
+  cursor?: string,
+  take = LEADS_PAGE_SIZE,
+): Promise<Page<LeadRow>> {
+  return toPage(await getLeads(status, cursor, take), take);
+}
 
 export async function getRecentLeads(limit = 8) {
   return prisma.lead.findMany({
@@ -195,11 +238,11 @@ export async function getLeadStatusCounts(): Promise<Record<string, number>> {
 
 // --- Sessions ----------------------------------------------------------------
 
-export async function getSessions(limit = 100) {
+export async function getSessions(cursor?: string, take = SESSIONS_PAGE_SIZE) {
   return prisma.session.findMany({
     where: { site: SITE },
-    orderBy: { startedAt: "desc" },
-    take: limit,
+    orderBy: [{ startedAt: "desc" }, { id: "desc" }],
+    ...cursorArgs(cursor, take),
     include: {
       visitor: {
         select: {
@@ -218,6 +261,19 @@ export async function getSessions(limit = 100) {
 }
 
 export type SessionRow = Awaited<ReturnType<typeof getSessions>>[number];
+
+/** Total sessions for this site, for the "showing x of y" line. */
+export async function countSessions(): Promise<number> {
+  return prisma.session.count({ where: { site: SITE } });
+}
+
+/** One page of sessions, plus the cursor that fetches the next. */
+export async function getSessionsPage(
+  cursor?: string,
+  take = SESSIONS_PAGE_SIZE,
+): Promise<Page<SessionRow>> {
+  return toPage(await getSessions(cursor, take), take);
+}
 
 /** Chunks are stored gzip'd and in order; this reassembles the full rrweb stream. */
 export async function getSessionReplay(sessionId: string): Promise<unknown[]> {
@@ -442,11 +498,11 @@ export async function getPerformanceStats(days = 30): Promise<PerformanceStat[]>
 
 // --- Errors ------------------------------------------------------------------
 
-export async function getErrors(limit = 100) {
+export async function getErrors(cursor?: string, take = ERRORS_PAGE_SIZE) {
   return prisma.errorEvent.findMany({
     where: { site: SITE },
-    orderBy: { createdAt: "desc" },
-    take: limit,
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    ...cursorArgs(cursor, take),
     select: {
       id: true,
       type: true,
@@ -457,6 +513,21 @@ export async function getErrors(limit = 100) {
       sessionId: true,
     },
   });
+}
+
+export type ErrorRow = Awaited<ReturnType<typeof getErrors>>[number];
+
+/** Total errors for this site, for the "showing x of y" line. */
+export async function countErrors(): Promise<number> {
+  return prisma.errorEvent.count({ where: { site: SITE } });
+}
+
+/** One page of errors, plus the cursor that fetches the next. */
+export async function getErrorsPage(
+  cursor?: string,
+  take = ERRORS_PAGE_SIZE,
+): Promise<Page<ErrorRow>> {
+  return toPage(await getErrors(cursor, take), take);
 }
 
 // --- Nav badges --------------------------------------------------------------

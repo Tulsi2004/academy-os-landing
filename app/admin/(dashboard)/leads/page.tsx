@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { Download } from "lucide-react";
 import { PageHeader } from "@/components/admin/PageHeader";
-import { Table, Thead, Th, Tr, Td, EmptyState } from "@/components/admin/Table";
-import { LeadStatusSelect } from "@/components/admin/LeadStatusSelect";
-import { getLeadStatusCounts, getLeads } from "@/lib/admin/queries";
+import { LeadsTable } from "@/components/admin/LeadsTable";
+import { getLeadStatusCounts, getLeadsPage } from "@/lib/admin/queries";
+import { toLeadRowView } from "@/lib/admin/rows";
 import { LEAD_STATUSES, type LeadStatus } from "@/lib/analytics/payload";
-import { dateTime, locationLabel } from "@/lib/admin/format";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +21,8 @@ export default async function LeadsPage({
 }) {
   const status = resolveStatus((await searchParams).status);
 
-  const [leads, counts] = await Promise.all([getLeads(status), getLeadStatusCounts()]);
+  // Only the first page is fetched here; LeadsTable pulls the rest on demand.
+  const [page, counts] = await Promise.all([getLeadsPage(status), getLeadStatusCounts()]);
   const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
   return (
@@ -54,54 +54,15 @@ export default async function LeadsPage({
         ))}
       </div>
 
-      <Table>
-        <Thead>
-          <Th>Received</Th>
-          <Th>Name</Th>
-          <Th>Email</Th>
-          <Th>Phone</Th>
-          <Th>Company</Th>
-          <Th>Message</Th>
-          <Th>Source</Th>
-          <Th>Location</Th>
-          <Th>Status</Th>
-        </Thead>
-        <tbody>
-          {leads.length === 0 ? (
-            <EmptyState
-              title={status ? `No ${status} leads` : "No leads yet"}
-              hint={
-                status
-                  ? "Try another status filter."
-                  : "The Lead table and /api/leads are live — leads land here as soon as a form on the public site posts to it."
-              }
-              colSpan={9}
-            />
-          ) : (
-            leads.map((lead) => (
-              <Tr key={lead.id}>
-                <Td>{dateTime(lead.createdAt)}</Td>
-                <Td>{lead.name ?? "—"}</Td>
-                <Td truncate>
-                  {lead.email ? <a href={`mailto:${lead.email}`}>{lead.email}</a> : "—"}
-                </Td>
-                <Td>{lead.phone ? <a href={`tel:${lead.phone}`}>{lead.phone}</a> : "—"}</Td>
-                <Td truncate>{lead.company ?? "—"}</Td>
-                <Td truncate title={lead.message ?? undefined}>
-                  {lead.message ?? "—"}
-                </Td>
-                <Td truncate>
-                  {lead.session?.utmSource ?? lead.source ?? lead.session?.referrer ?? "direct"}
-                </Td>
-                <Td>{locationLabel(lead.visitor?.city, lead.visitor?.country)}</Td>
-                <Td>
-                  <LeadStatusSelect leadId={lead.id} status={lead.status} />
-                </Td>
-              </Tr>
-            ))
-          )}
-        </tbody>
-      </Table>
+      <LeadsTable
+        // Remount on filter change so the table starts from that filter's first
+        // page rather than appending to the previous filter's rows.
+        key={status ?? "all"}
+        initialLeads={page.items.map(toLeadRowView)}
+        initialCursor={page.nextCursor}
+        total={status ? (counts[status] ?? 0) : total}
+        status={status}
+      />
     </>
   );
 }
